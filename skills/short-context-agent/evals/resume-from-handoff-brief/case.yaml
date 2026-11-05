@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: resume-from-handoff-brief
+expected_outcome: |
+  The agent resumes from the brief without re-deriving verified facts: it checks the open
+  hypothesis first (CHANGELOG), applies the planned fix in app/dates/parse.py, runs the suite,
+  and rewrites .claude/handoff.md with the change marked verified. It does not retry either
+  dead end (changing settings.DEFAULT_TZ or editing the test).
+context:
+  scaffold_script: place-files.sh

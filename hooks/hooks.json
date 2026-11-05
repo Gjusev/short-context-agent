@@ -1,0 +1,19 @@
+{
+  "description": "Re-inject the on-disk handoff brief (.claude/handoff.md) after /compact or /clear so the structured task state survives the reset. No-op when no fresh brief exists.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/skills/short-context-agent/scripts/inject_brief.py"],
+            "timeout": 10,
+            "statusMessage": "Re-injecting handoff brief"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "short-context-agent",
+  "description": "Open reproduction of 'You Don't Need Long Context' (arXiv:2611.05306): handoff-brief compaction and selective reading as a Claude Code plugin",
+  "owner": {
+    "name": "Grigory Sapunov"
+  },
+  "plugins": [
+    {
+      "name": "short-context-agent",
+      "source": "./",
+      "description": "Handoff-brief compaction (EoCC/SAC) and selective reading for long-horizon tasks: the skill plus a SessionStart hook that re-injects the brief after /compact or /clear"
+    }
+  ]
+}

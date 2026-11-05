@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: writes-handoff-brief-mid-task
+expected_outcome: |
+  The agent fixes app/dates/parse.py so naive input is UTC and offset input keeps its offset,
+  and writes .claude/handoff.md as a six-part forward-looking brief (objective; established
+  facts split into verified vs hypotheses with path:line locations; changes applied with
+  verification status; checks run with exact commands; dead ends; remaining plan in execution
+  order starting with an exact command). The brief is a state description, not a narrative,
+  and it is updated after the suite passes.
+context:
+  scaffold_script: place-files.sh

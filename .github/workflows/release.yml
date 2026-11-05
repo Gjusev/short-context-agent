@@ -1,0 +1,34 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Smoke tests
+        run: bash tests/smoke.sh
+      - name: Check plugin.json version matches the tag
+        run: |
+          v="$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "plugin.json version v$v does not match tag $GITHUB_REF_NAME"; exit 1; }
+      - name: Build release assets
+        run: |
+          mkdir -p dist
+          # Skill package for the Claude apps and the Skills API: the skill folder, evals excluded
+          (cd skills && zip -qr ../dist/short-context-agent.skill short-context-agent \
+              -x 'short-context-agent/evals/*' -x '*/__pycache__/*')
+          # Plugin bundle for `claude --plugin-dir` / `--plugin-url`: manifests, hook and skill, evals excluded
+          zip -qr dist/short-context-agent-plugin.zip .claude-plugin hooks skills README.md LICENSE CITATION.cff \
+              -x '*/evals/*' -x '*/__pycache__/*'
+          ls -la dist
+      - name: Create GitHub release with assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes dist/*

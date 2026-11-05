@@ -1,0 +1,183 @@
+#!/usr/bin/env python3
+"""doc-read: return a bounded window of a large file so an agent never has to load it whole.
+
+Modelled on the `doc-read` utility from "You don't need long context" (arXiv:2611.05306):
+windows default to 6,000 characters and are hard-capped at 8,000. If a window is
+truncated, narrow the range instead of widening it.
+
+Usage:
+  doc-read FILE                          stats only (lines, chars, bytes)
+  doc-read --lines 3835:3870 FILE        inclusive 1-based line range, numbered
+  doc-read --around 3840 FILE            20 lines of context each side (default)
+  doc-read --around 3840:8 FILE          8 lines of context each side
+  doc-read --head 40 FILE                first N lines
+  doc-read --chars 120000:125000 FILE    inclusive 1-based character range, raw
+  doc-read --grep 'kademor' FILE         numbered matching lines (regex, max 20 hits)
+  doc-read --grep 'to be mad' -i FILE    case-insensitive
+  doc-read --grep PATTERN --max-hits 50 FILE
+
+Options:
+  --max-chars N   soft limit for this call (default 6000, never above the 8000 hard cap)
+
+Exit codes: 0 ok, 1 file/IO error, 2 bad arguments.
+"""
+import argparse
+import re
+import sys
+
+HARD_CAP = 8000
+DEFAULT_MAX = 6000
+GREP_LINE_MAX = 240
+
+
+def die(msg, code=1):
+    sys.stderr.write(msg + "\n")
+    sys.exit(code)
+
+
+def parse_range(spec, name):
+    m = re.fullmatch(r"\s*(\d+)\s*:\s*(\d+)\s*", spec)
+    if not m:
+        die(f"doc-read: --{name} expects START:END (1-based, inclusive), got {spec!r}", 2)
+    a, b = int(m.group(1)), int(m.group(2))
+    if a < 1 or b < a:
+        die(f"doc-read: --{name} range must satisfy 1 <= START <= END, got {spec!r}", 2)
+    return a, b
+
+
+def emit(text, cap):
+    """Print text, enforcing the character cap with a visible marker."""
+    if len(text) > cap:
+        text = text[:cap].rstrip("\n")
+        text += (f"\n[doc-read: output truncated at {cap} chars "
+                 f"(hard cap {HARD_CAP}); narrow the window]")
+    sys.stdout.write(text)
+    if not text.endswith("\n"):
+        sys.stdout.write("\n")
+
+
+def iter_lines(path):
+    with open(path, "r", encoding="utf-8", errors="replace") as fh:
+        for i, line in enumerate(fh, 1):
+            yield i, line
+
+
+def stats(path):
+    lines = chars = 0
+    with open(path, "rb") as fh:
+        nbytes = fh.seek(0, 2)
+    for _, line in iter_lines(path):
+        lines += 1
+        chars += len(line)
+    return lines, chars, nbytes
+
+
+def cmd_lines(path, a, b, cap):
+    width = len(str(b))
+    out = []
+    last = 0
+    for i, line in iter_lines(path):
+        last = i
+        if i < a:
+            continue
+        if i > b:
+            break
+        out.append(f"{i:>{width}}: {line.rstrip(chr(10))}")
+    if not out:
+        total, _, _ = stats(path)
+        sys.exit(f"doc-read: no lines in range {a}:{b} (file has {total} lines)")
+    emit("\n".join(out) + "\n", cap)
+
+
+def cmd_chars(path, a, b, cap):
+    with open(path, "r", encoding="utf-8", errors="replace") as fh:
+        fh.seek(0)
+        text = fh.read()
+    if a > len(text):
+        sys.exit(f"doc-read: start {a} is past end of file ({len(text)} chars)")
+    emit(text[a - 1:b], cap)
+
+
+def cmd_grep(path, pattern, ignore_case, max_hits, cap):
+    flags = re.IGNORECASE if ignore_case else 0
+    try:
+        rx = re.compile(pattern, flags)
+    except re.error as e:
+        die(f"doc-read: bad regex {pattern!r}: {e}", 2)
+    hits = []
+    total = 0
+    for i, line in iter_lines(path):
+        if rx.search(line):
+            total += 1
+            if len(hits) < max_hits:
+                body = line.rstrip("\n")
+                if len(body) > GREP_LINE_MAX:
+                    body = body[:GREP_LINE_MAX] + " […]"
+                hits.append(f"{i}: {body}")
+    if not hits:
+        emit(f"[doc-read: no match for {pattern!r}]\n", cap)
+        return
+    tail = f"\n[doc-read: {total} matching line(s), showing {len(hits)}]"
+    emit("\n".join(hits) + tail + "\n", cap)
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(add_help=False)
+    p.add_argument("--lines")
+    p.add_argument("--chars")
+    p.add_argument("--around")
+    p.add_argument("--head", type=int)
+    p.add_argument("--grep")
+    p.add_argument("-i", action="store_true", dest="ignore_case")
+    p.add_argument("--max-hits", type=int, default=20)
+    p.add_argument("--max-chars", type=int, default=DEFAULT_MAX)
+    p.add_argument("-h", "--help", action="store_true")
+    p.add_argument("file", nargs="?")
+    args = p.parse_args(argv)
+
+    if args.help or not args.file:
+        sys.stdout.write(__doc__)
+        return 0 if args.help else 2
+
+    cap = max(100, min(args.max_chars, HARD_CAP))
+    modes = [m for m in ("lines", "chars", "around", "head", "grep") if getattr(args, m) is not None]
+    if len(modes) > 1:
+        die("doc-read: use only one of --lines, --chars, --around, --head, --grep", 2)
+
+    try:
+        if not modes:
+            lines, chars, nbytes = stats(args.file)
+            sys.stdout.write(f"{args.file}: {lines} lines, {chars} chars, {nbytes} bytes\n"
+                             f"Read a window: --lines A:B | --around N[:CTX] | --grep PATTERN\n")
+            return 0
+        mode = modes[0]
+        if mode == "lines":
+            a, b = parse_range(args.lines, "lines")
+            cmd_lines(args.file, a, b, cap)
+        elif mode == "around":
+            m = re.fullmatch(r"\s*(\d+)(?::(\d+))?\s*", args.around)
+            if not m:
+                die("doc-read: --around expects LINE or LINE:CONTEXT", 2)
+            centre = int(m.group(1))
+            ctx = int(m.group(2)) if m.group(2) else 20
+            cmd_lines(args.file, max(1, centre - ctx), centre + ctx, cap)
+        elif mode == "head":
+            if args.head < 1:
+                die("doc-read: --head expects N >= 1", 2)
+            cmd_lines(args.file, 1, args.head, cap)
+        elif mode == "chars":
+            a, b = parse_range(args.chars, "chars")
+            cmd_chars(args.file, a, b, cap)
+        elif mode == "grep":
+            cmd_grep(args.file, args.grep, args.ignore_case, max(1, args.max_hits), cap)
+    except FileNotFoundError:
+        sys.exit(f"doc-read: no such file: {args.file}")
+    except IsADirectoryError:
+        sys.exit(f"doc-read: {args.file} is a directory")
+    except OSError as e:
+        sys.exit(f"doc-read: {e}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

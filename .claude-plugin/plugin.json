@@ -1,0 +1,14 @@
+{
+  "name": "short-context-agent",
+  "displayName": "Short-Context Agent",
+  "version": "0.1.0",
+  "description": "Keep agentic work inside a short context window: forward-looking handoff briefs (EoCC/SAC compaction) and selective reading of large inputs. Open reproduction of 'You Don't Need Long Context' (arXiv:2611.05306).",
+  "author": {
+    "name": "Grigory Sapunov",
+    "url": "https://github.com/che-shr-cat"
+  },
+  "homepage": "https://github.com/che-shr-cat/short-context-agent",
+  "repository": "https://github.com/che-shr-cat/short-context-agent",
+  "license": "MIT",
+  "keywords": ["context-compaction", "long-context", "agent-harness", "handoff-brief", "selective-reading"]
+}

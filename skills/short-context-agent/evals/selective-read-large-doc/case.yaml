@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: selective-read-large-doc
+expected_outcome: |
+  The agent locates the relevant line with a search (grep / Grep) and reads only a bounded
+  window around it; it never loads the whole 775 KB file into context. It answers that
+  kademor means "to be mad" and that with the applicative it introduces an object to the
+  scene, citing line 3840.
+context:
+  scaffold_script: place-files.sh

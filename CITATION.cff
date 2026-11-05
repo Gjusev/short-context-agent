@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: "If you use this software, cite the paper it reproduces (see references) and, optionally, this repository."
+type: software
+title: "short-context-agent"
+abstract: "An open reproduction of 'You Don't Need Long Context' (arXiv:2611.05306): handoff-brief compaction (EoCC/SAC) and selective reading as a Claude skill plus a reference agent harness."
+version: 0.1.0
+date-released: 2026-11-05
+license: MIT
+repository-code: "https://github.com/che-shr-cat/short-context-agent"
+authors:
+  - family-names: Sapunov
+    given-names: Grigory
+keywords:
+  - context compaction
+  - long context
+  - agent harness
+  - claude skill
+references:
+  - type: article
+    title: "You Don't Need Long Context"
+    year: 2026
+    url: "https://arxiv.org/abs/2611.05306"
+    identifiers:
+      - type: other
+        value: "arXiv:2611.05306"
+    authors:
+      - family-names: Belcak
+        given-names: Peter
+      - family-names: Muralidharan
+        given-names: Saurav
+      - family-names: Jiang
+        given-names: Jindong
+      - family-names: Fu
+        given-names: Yonggan
+      - family-names: Byeon
+        given-names: Wonmin
+      - family-names: Ye
+        given-names: Hanrong
+      - family-names: Angilly
+        given-names: Ryan
+      - family-names: Taghibakhshi
+        given-names: Ali
+      - family-names: Liu
+        given-names: Shih-Yang
+      - family-names: Ouyang
+        given-names: Siru
+      - family-names: Heinrich
+        given-names: Greg
+      - family-names: Molchanov
+        given-names: Pavlo
