@@ -1,0 +1,7 @@
+{
+  "id": "fix-import",
+  "task": "In this small repo, test_app.py fails with ModuleNotFoundError because app.py is missing. Create app.py so the test passes. Do not modify test_app.py.",
+  "setup": ["cp -r fixtures/* ."],
+  "verify": "python3 -m pytest -q test_app.py",
+  "workdir": "tasks/fix-import"
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "task": "count-words",
+    "regime": "fha",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/count-words/fha/transcript.jsonl"
+  },
+  {
+    "task": "count-words",
+    "regime": "eocc",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/count-words/eocc/transcript.jsonl"
+  },
+  {
+    "task": "count-words",
+    "regime": "sac",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/count-words/sac/transcript.jsonl"
+  },
+  {
+    "task": "fix-import",
+    "regime": "fha",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/fix-import/fha/transcript.jsonl"
+  },
+  {
+    "task": "fix-import",
+    "regime": "eocc",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/fix-import/eocc/transcript.jsonl"
+  },
+  {
+    "task": "fix-import",
+    "regime": "sac",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/fix-import/sac/transcript.jsonl"
+  },
+  {
+    "task": "make-config",
+    "regime": "fha",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/make-config/fha/transcript.jsonl"
+  },
+  {
+    "task": "make-config",
+    "regime": "eocc",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/make-config/eocc/transcript.jsonl"
+  },
+  {
+    "task": "make-config",
+    "regime": "sac",
+    "passed": false,
+    "exit_code": 0,
+    "peak_live_context_tokens": 0,
+    "log": "/root/work/short-context-agent/evals/workdirs/make-config/sac/transcript.jsonl"
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "id": "make-config",
+  "task": "Create a file named config.yaml in this directory containing exactly the line 'mode: safe' (nothing else).",
+  "setup": [],
+  "verify": "grep -qx 'mode: safe' config.yaml",
+  "workdir": "tasks/make-config"
+}
