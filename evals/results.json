@@ -1,74 +1,190 @@
-[
-  {
-    "task": "count-words",
-    "regime": "fha",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/count-words/fha/transcript.jsonl"
+{
+  "meta": {
+    "date": "2026-11-10T17:01:54+00:00",
+    "real": true,
+    "model": "glm-5.3-flash",
+    "command": "python3 evals/run_evals.py --real --model glm-5.3-flash"
   },
-  {
-    "task": "count-words",
-    "regime": "eocc",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/count-words/eocc/transcript.jsonl"
-  },
-  {
-    "task": "count-words",
-    "regime": "sac",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/count-words/sac/transcript.jsonl"
-  },
-  {
-    "task": "fix-import",
-    "regime": "fha",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/fix-import/fha/transcript.jsonl"
-  },
-  {
-    "task": "fix-import",
-    "regime": "eocc",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/fix-import/eocc/transcript.jsonl"
-  },
-  {
-    "task": "fix-import",
-    "regime": "sac",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/fix-import/sac/transcript.jsonl"
-  },
-  {
-    "task": "make-config",
-    "regime": "fha",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/make-config/fha/transcript.jsonl"
-  },
-  {
-    "task": "make-config",
-    "regime": "eocc",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/make-config/eocc/transcript.jsonl"
-  },
-  {
-    "task": "make-config",
-    "regime": "sac",
-    "passed": false,
-    "exit_code": 0,
-    "peak_live_context_tokens": 0,
-    "log": "/root/work/short-context-agent/evals/workdirs/make-config/sac/transcript.jsonl"
-  }
-]
+  "results": [
+    {
+      "task": "count-words",
+      "regime": "fha",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1134,
+      "actions": 4,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/count-words/fha/transcript.jsonl"
+    },
+    {
+      "task": "count-words",
+      "regime": "eocc",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 995,
+      "actions": 4,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/count-words/eocc/transcript.jsonl"
+    },
+    {
+      "task": "count-words",
+      "regime": "sac",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1941,
+      "actions": 6,
+      "compactions": 5,
+      "final_answer": true,
+      "log": "evals/workdirs/count-words/sac/transcript.jsonl"
+    },
+    {
+      "task": "find-needle-log",
+      "regime": "fha",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 779,
+      "actions": 2,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/find-needle-log/fha/transcript.jsonl"
+    },
+    {
+      "task": "find-needle-log",
+      "regime": "eocc",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1059,
+      "actions": 4,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/find-needle-log/eocc/transcript.jsonl"
+    },
+    {
+      "task": "find-needle-log",
+      "regime": "sac",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1657,
+      "actions": 4,
+      "compactions": 4,
+      "final_answer": true,
+      "log": "evals/workdirs/find-needle-log/sac/transcript.jsonl"
+    },
+    {
+      "task": "fix-import",
+      "regime": "fha",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1648,
+      "actions": 9,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/fix-import/fha/transcript.jsonl"
+    },
+    {
+      "task": "fix-import",
+      "regime": "eocc",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1459,
+      "actions": 8,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/fix-import/eocc/transcript.jsonl"
+    },
+    {
+      "task": "fix-import",
+      "regime": "sac",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1809,
+      "actions": 10,
+      "compactions": 9,
+      "final_answer": true,
+      "log": "evals/workdirs/fix-import/sac/transcript.jsonl"
+    },
+    {
+      "task": "make-config",
+      "regime": "fha",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 584,
+      "actions": 1,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/make-config/fha/transcript.jsonl"
+    },
+    {
+      "task": "make-config",
+      "regime": "eocc",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 621,
+      "actions": 1,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/make-config/eocc/transcript.jsonl"
+    },
+    {
+      "task": "make-config",
+      "regime": "sac",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 1147,
+      "actions": 2,
+      "compactions": 2,
+      "final_answer": true,
+      "log": "evals/workdirs/make-config/sac/transcript.jsonl"
+    },
+    {
+      "task": "staged-release",
+      "regime": "fha",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 3826,
+      "actions": 14,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/staged-release/fha/transcript.jsonl"
+    },
+    {
+      "task": "staged-release",
+      "regime": "eocc",
+      "passed": true,
+      "exit_code": 0,
+      "harness_error": false,
+      "peak_live_context_tokens": 3728,
+      "actions": 10,
+      "compactions": 0,
+      "final_answer": true,
+      "log": "evals/workdirs/staged-release/eocc/transcript.jsonl"
+    },
+    {
+      "task": "staged-release",
+      "regime": "sac",
+      "passed": true,
+      "exit_code": "timeout",
+      "harness_error": true,
+      "peak_live_context_tokens": 0,
+      "actions": 0,
+      "compactions": 0,
+      "final_answer": false,
+      "log": "evals/workdirs/staged-release/sac/transcript.jsonl"
+    }
+  ]
+}
