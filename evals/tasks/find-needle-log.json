@@ -1,0 +1,7 @@
+{
+  "id": "find-needle-log",
+  "task": "server.log in this directory is a very large log file (~20,000 lines). Do NOT read it whole: locate with grep -n, then read a bounded window (doc-read --around LINE). Exactly one line contains 'transaction=8817'. On that line a confirmation code follows the word 'CODE'. Write that code as the only content of answer.txt (single line, no quotes, no extra whitespace).",
+  "setup": ["python3 ../../../fixtures/find-needle-log/generate.py"],
+  "verify": "grep -qx 'K7QX-ZULU-4229' answer.txt",
+  "workdir": "tasks/find-needle-log"
+}

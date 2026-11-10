@@ -18,10 +18,19 @@ Task format (evals/tasks/<id>.json):
     "task": "Make the failing test in the repo pass.",
     "setup": ["python3 -m venv? ..."],        // shell lines run before the agent starts
     "verify": "python3 -m pytest -q",          // exit 0 = pass
-    "workdir": "tasks/fix-test"                // directory copied from evals/fixtures/
+    "workdir": "tasks/fix-test"                // (informational) workdir template id
   }
+
+The agent's starting files come from evals/fixtures/<id>/fixtures/ — everything
+under it is copied into the run's workdir before setup lines run. Files next to
+that directory (e.g. deterministic generators) are NOT copied; setup lines can
+invoke them by relative path to build large inputs without bloating the repo.
+
+Peak live context is taken from the harness's own JSON summary on stdout
+(measured from real token usage), not estimated here.
 """
 import argparse
+import datetime
 import json
 import shutil
 import subprocess
@@ -30,9 +39,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 HARNESS = ROOT / "skills" / "short-context-agent" / "scripts" / "sac_harness.py"
-TASKS_DIR = Path(__file__).resolve().parent / "tasks"
-WORKDIRS = Path(__file__).resolve().parent / "workdirs"
+EVALS = Path(__file__).resolve().parent
+TASKS_DIR = EVALS / "tasks"
+FIXTURES = EVALS / "fixtures"
+WORKDIRS = EVALS / "workdirs"
 REGIMES = ["fha", "eocc", "sac"]
+RUN_TIMEOUT = 1800  # seconds per task x regime harness run
 
 
 def load_tasks():
@@ -42,12 +54,33 @@ def load_tasks():
     return tasks
 
 
+def copy_fixture(task, workdir):
+    """Copy evals/fixtures/<id>/fixtures/* into the workdir (the task's starting files)."""
+    src = FIXTURES / task["id"] / "fixtures"
+    if not src.is_dir():
+        return
+    for item in src.iterdir():
+        if item.is_dir():
+            shutil.copytree(item, workdir / item.name)
+        else:
+            shutil.copy2(item, workdir / item.name)
+
+
+def harness_summary(stdout):
+    """The harness prints one JSON summary object on stdout; peak_ctx etc. come from there."""
+    try:
+        return json.loads(stdout[stdout.index("{"):])
+    except (ValueError, json.JSONDecodeError):
+        return {}
+
+
 def run_one(task, regime, real, model):
     workdir = WORKDIRS / task["id"] / regime
     if workdir.exists():
         shutil.rmtree(workdir)
     workdir.parent.mkdir(parents=True, exist_ok=True)
     workdir.mkdir()
+    copy_fixture(task, workdir)
 
     # set up the task workspace
     # shell=True is intentional: setup/verify lines come from trusted, repo-authored
@@ -66,30 +99,31 @@ def run_one(task, regime, real, model):
     if model:
         cmd += ["--model", model]
 
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=RUN_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        proc = None
+
+    # keep the harness's stderr for post-mortems (crashes land there)
+    if proc is not None and proc.stderr.strip():
+        (workdir / "stderr.txt").write_text(proc.stderr, encoding="utf-8")
 
     # verify the end state
     verify = subprocess.run(task["verify"], shell=True, cwd=workdir, capture_output=True)
     passed = verify.returncode == 0
 
-    # peak live context: the harness logs every discarded conversation; in dry-run
-    # mode we approximate peak context by the number of logged turns * avg turn size
-    peak_ctx = 0
-    if log.exists():
-        for line in log.read_text().splitlines():
-            try:
-                entry = json.loads(line)
-                peak_ctx = max(peak_ctx, entry.get("live_context_tokens", 0))
-            except json.JSONDecodeError:
-                continue
-
+    summary = harness_summary(proc.stdout) if proc else {}
     return {
         "task": task["id"],
         "regime": regime,
         "passed": passed,
-        "exit_code": proc.returncode,
-        "peak_live_context_tokens": peak_ctx,
-        "log": str(log) if log.exists() else "",
+        "exit_code": proc.returncode if proc else "timeout",
+        "harness_error": bool(proc is None or proc.returncode != 0),
+        "peak_live_context_tokens": summary.get("peak_ctx", 0),
+        "actions": summary.get("actions", 0),
+        "compactions": summary.get("compactions", 0),
+        "final_answer": bool(summary.get("final")),
+        "log": str(log.relative_to(ROOT).as_posix()) if log.exists() else "",
     }
 
 
@@ -109,11 +143,19 @@ def main():
         for regime in regimes:
             row = run_one(task, regime, args.real, args.model)
             mark = "PASS" if row["passed"] else "FAIL"
-            print(f"  [{mark}] {row['task']:16} {regime:5} peak_ctx={row['peak_live_context_tokens']}")
+            err = " ERR" if row["harness_error"] else ""
+            print(f"  [{mark}] {row['task']:16} {regime:5} peak_ctx={row['peak_live_context_tokens']:6} "
+                  f"compactions={row['compactions']:3} final={row['final_answer']}{err}", flush=True)
             results.append(row)
 
-    out = ROOT / "evals" / "results.json"
-    out.write_text(json.dumps(results, indent=2))
+    meta = {
+        "date": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "real": args.real,
+        "model": args.model or ("fake (dry-run)" if not args.real else "harness default"),
+        "command": "python3 " + " ".join(sys.argv),
+    }
+    out = EVALS / "results.json"
+    out.write_text(json.dumps({"meta": meta, "results": results}, indent=2))
 
     # summary per regime
     print("\nSummary (accuracy / avg peak context):")

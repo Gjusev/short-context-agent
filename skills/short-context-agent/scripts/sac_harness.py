@@ -190,6 +190,11 @@ class FakeClient:
 
 
 class AnthropicClient:
+    # transient upstream conditions (rate limit, overload, 5xx, timeouts) are
+    # routine during long batch runs; one should not kill the whole run
+    RETRY_STATUS = {429, 500, 502, 503, 529}
+    MAX_ATTEMPTS = 6
+
     def __init__(self, model):
         try:
             import anthropic
@@ -197,6 +202,13 @@ class AnthropicClient:
             sys.exit("pip install anthropic   (or use --dry-run)")
         self._client = anthropic.Anthropic()
         self.model = model
+
+    @staticmethod
+    def _retryable(exc):
+        import anthropic
+        if isinstance(exc, (anthropic.APITimeoutError, anthropic.APIConnectionError)):
+            return True
+        return isinstance(exc, anthropic.APIStatusError) and exc.status_code in AnthropicClient.RETRY_STATUS
 
     def create(self, *, messages, tools, tool_choice=None, max_tokens=4096):
         kwargs = dict(
@@ -208,7 +220,13 @@ class AnthropicClient:
         )
         if tool_choice:
             kwargs["tool_choice"] = tool_choice
-        return self._client.messages.create(**kwargs)
+        for attempt in range(self.MAX_ATTEMPTS):
+            try:
+                return self._client.messages.create(**kwargs)
+            except Exception as exc:
+                if attempt == self.MAX_ATTEMPTS - 1 or not self._retryable(exc):
+                    raise
+                time.sleep(min(2 ** attempt, 30))
 
 
 # ----------------------------------------------------------------------------- the loop

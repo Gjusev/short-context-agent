@@ -1,7 +1,7 @@
 {
   "id": "count-words",
   "task": "In docs/ there are text files. Create word_counts.json mapping every distinct word (lowercase) to how many times it appears across all files in docs/, sorted by count descending.",
-  "setup": ["cp -r fixtures/* ."],
+  "setup": [],
   "verify": "python3 -c \"import json; d=json.load(open('word_counts.json')); items=list(d.items()); assert items[0]==('alpha',2) or items[0][1]>=max(v for k,v in items)\" ",
   "workdir": "tasks/count-words"
 }

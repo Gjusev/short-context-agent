@@ -1,0 +1,7 @@
+{
+  "id": "staged-release",
+  "task": "specs/ contains five numbered release specifications for the small package in app/. Apply ALL five, in order. Your conversation may be reset at any time and only a short handoff brief carries over, so record progress (which specs are done, what remains) as you go, or re-derive it from the files on disk. Run python3 -m pytest -q to check; the task is complete when all five tests pass. Do not modify files under tests/.",
+  "setup": [],
+  "verify": "python3 -m pytest -q",
+  "workdir": "tasks/staged-release"
+}

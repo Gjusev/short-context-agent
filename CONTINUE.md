@@ -40,18 +40,18 @@ error appears, stop and report — do NOT switch providers.
 
 ## Current task (do this now)
 
-Fill the evals the upstream roadmap asks for ("Contributions welcome,
-especially benchmark runs"):
+The previous handoff's task is DONE (tasks + template + real run committed;
+see `evals/results/` and the git log). Verified along the way: the anthropic
+SDK picks up ANTHROPIC_BASE_URL/ANTHROPIC_AUTH_TOKEN natively, so the harness
+needed no patch; `run_evals.py` now copies `fixtures/<id>/fixtures/` into the
+workdir itself (the old `cp -r fixtures/* .` setup lines never worked — the
+copy step was documented but unimplemented, masked by dry-run) and takes peak
+live context from the harness's stdout summary instead of a log field that
+never existed.
 
-1. Add 2-3 more deterministic tasks to `evals/tasks/` — at least one
-   long-input task where the answer sits in a file the agent must grep for
-   (selective reading / LCW2 regime) and one multi-step task where the
-   handoff brief must carry state between compacted conversations.
-2. Add `evals/results/` with a README template: suite version, model, regime,
-   accuracy, peak live context, raw command. No fabricated entries.
-3. If ANTHROPIC_API_KEY is present, run all tasks x regimes for real and
-   commit results. Otherwise stop after the tasks + template.
-4. Push to `evals-scaffold` — the open PR picks it up automatically.
+Nothing queued for this fork right now. Pick up the upstream roadmap instead
+(below), or improve the suite: more tasks, tighter token accounting, a second
+model for comparison (a results/ entry per model is the format).
 
 ## After that
 
