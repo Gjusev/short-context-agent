@@ -21,6 +21,23 @@ Read upstream README.md, our evals/README.md and the PR conversation first.
 - Upstream PR etiquette: small focused commits, reference the roadmap item
   each change fulfills, no drive-by refactors of their code.
 
+## Models — Z.ai Coding Plan (mandatory)
+
+Real harness runs (`--real`) go through the Z.ai Coding Plan subscription —
+the plan exposes an Anthropic-compatible endpoint, so the anthropic-SDK
+harness works without code changes:
+
+```bash
+export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+export ANTHROPIC_AUTH_TOKEN="<Z.ai Coding Plan key>"
+export ANTHROPIC_MODEL="glm-5.3-flash"   # Z.ai model through the compat layer
+```
+
+First verify `sac_harness.py` actually reads ANTHROPIC_BASE_URL — if it only
+reads ANTHROPIC_API_KEY, add base-URL support via env (small upstream-friendly
+patch, note it in the PR). Flat subscription billing: if a billing/endpoint
+error appears, stop and report — do NOT switch providers.
+
 ## Current task (do this now)
 
 Fill the evals the upstream roadmap asks for ("Contributions welcome,
